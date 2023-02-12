@@ -31,16 +31,9 @@ def main(formData):
         download_audio(urls[i])
 
     list_files=glob.glob('./*.mp3')
-    for i in range(0,num):
-        initial="00:00"
-        if(time<10):
-            fin="00:0"+str(time)
-        else:
-            fin="00:"+str(time)
-        filename=list_files[i]
-        trimmed_file=get_trimmed(filename,initial,fin)
-        trimmed_filename="audio"+str(i)+"trimmed.mp3"
-        trimmed_file.export(trimmed_filename,format="mp3")
+    for i in range(num):
+        audio_file = list_files[i]
+        cut_audios(audio_file, num, time)
 
     s1=AudioSegment.from_mp3("./audio0trimmed.mp3")
     for i in range(1,num):
@@ -63,7 +56,7 @@ def main(formData):
     from email.mime.base import MIMEBase
     from email import encoders
 
-    fromaddr = "amiglani_be20@thapar.edu"
+    fromaddr = "Enter E-Mail ID"
     toaddr = email
 
     # instance of MIMEMultipart
@@ -103,7 +96,7 @@ def main(formData):
     s.starttls()
 
     # Authentication
-    s.login(fromaddr, "Akku@41421")
+    s.login(fromaddr, "Enter Password")
 
     # Converts the Multipart msg into a string
     text = msg.as_string()
@@ -140,17 +133,11 @@ def get_video_time_in_ms(video_timestamp):
     
     return hours + minutes + seconds
 
-
-def get_trimmed(mp3_filename, initial, final = ""):
-    sound = AudioSegment.from_mp3(mp3_filename)
-    t0 = get_video_time_in_ms(initial)
-    print("Beginning trimming process for file ", mp3_filename, ".\n")
-    print("Starting from ", initial, "...")
-    if (len(final) > 0):
-        print("...up to ", final, ".\n")
-        t1 = get_video_time_in_ms(final)
-        return sound[t0:t1]
-    return sound[t0:]
+def cut_audios(singer_name, num, time):
+    for i in range(num):
+        audio = AudioSegment.from_file(singer_name)
+        audio = audio[:time * 1000]
+        audio.export('audio'+str(i)+'trimmed.mp3', format='mp3')
 
 def download_audio(yt_url):
     ydl_opts = {
